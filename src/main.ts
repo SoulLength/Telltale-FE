@@ -49,7 +49,14 @@ async function handleTranslation(fromSide: TranslatorSide): Promise<void> {
 
 // --- Audio ---
 function speak(base64: string): void {
-    new Audio(`data:audio/mp3;base64,${base64}`).play();
+    const ctx = new AudioContext();
+    const gainNode = ctx.createGain();
+    gainNode.gain.value = 4.0;
+    gainNode.connect(ctx.destination);
+
+    const audio = new Audio(`data:audio/mp3;base64,${base64}`);
+    ctx.createMediaElementSource(audio).connect(gainNode);
+    audio.play();
 }
 
 [DomManager.up.textArea, DomManager.down.textArea].forEach((area) => {
